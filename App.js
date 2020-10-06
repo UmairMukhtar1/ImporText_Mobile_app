@@ -24,8 +24,11 @@ const assetImages = [
   Images.androidLogo
 ];
 
+
+
 // cache product images
 articles.map(article => assetImages.push(article.image));
+
 
 function cacheImages(images) {
   return images.map(image => {
@@ -37,85 +40,88 @@ function cacheImages(images) {
   });
 }
 
-export default props => {
-  const [isLoadingComplete, setLoading] = useState(false);
-  let [fontsLoaded] = useFonts({
-    'ArgonExtra': require('./assets/font/argon.ttf'),
-  });
 
-  function _loadResourcesAsync() {
-    return Promise.all([...cacheImages(assetImages)]);
+export default class App extends React.Component {
+  state = {
+    isLoadingComplete: false
+  };
+
+  render() {
+    if (!this.state.isLoadingComplete) {
+      return (
+        <AppLoading
+          startAsync={this._loadResourcesAsync}
+          onError={this._handleLoadingError}
+          onFinish={this._handleFinishLoading}
+        />
+      );
+    } else {
+      return (
+        <NavigationContainer>
+          <GalioProvider theme={argonTheme}>
+            <Block flex>
+              <Screens />
+            </Block>
+          </GalioProvider>
+        </NavigationContainer>
+      );
+    }
   }
 
-  function _handleLoadingError(error) {
+  _loadResourcesAsync = async () => {
+    return Promise.all([...cacheImages(assetImages)]);
+  };
+
+  _handleLoadingError = error => {
     // In this case, you might want to report the error to your error
     // reporting service, for example Sentry
     console.warn(error);
   };
 
- function _handleFinishLoading() {
-    setLoading(true);
+  _handleFinishLoading = () => {
+    this.setState({ isLoadingComplete: true });
   };
-
-  if(!fontsLoaded && !isLoadingComplete) {
-    return (
-      <AppLoading
-        startAsync={_loadResourcesAsync}
-        onError={_handleLoadingError}
-        onFinish={_handleFinishLoading}
-      />
-    );
-  } else if(fontsLoaded) {
-    return (
-      <NavigationContainer>
-        <GalioProvider theme={argonTheme}>
-          <Block flex>
-            <Screens />
-          </Block>
-        </GalioProvider>
-      </NavigationContainer>
-    );
-  }
 }
 
-// export default class App extends React.Component {
-//   state = {
-//     isLoadingComplete: false
-//   };
 
-//   render() {
-//     if (!this.state.isLoadingComplete) {
-//       return (
-//         <AppLoading
-//           startAsync={this._loadResourcesAsync}
-//           onError={this._handleLoadingError}
-//           onFinish={this._handleFinishLoading}
-//         />
-//       );
-//     } else {
-//       return (
-//         <NavigationContainer>
-//           <GalioProvider theme={argonTheme}>
-//             <Block flex>
-//               <Screens />
-//             </Block>
-//           </GalioProvider>
-//         </NavigationContainer>
-//       );
-//     }
+// export default props => {
+//   const [isLoadingComplete, setLoading] = useState(false);
+//   let [fontsLoaded] = useFonts({
+//     'ArgonExtra': require('./assets/font/argon.ttf'),
+//   });
+
+//   function _loadResourcesAsync() {
+//     return Promise.all([...cacheImages(assetImages)]);
 //   }
 
-//   _loadResourcesAsync = async () => {
-//     return Promise.all([...cacheImages(assetImages)]);
-//   };
-
-//   _handleLoadingError = error => {
+//   function _handleLoadingError(error) {
 //     // In this case, you might want to report the error to your error
 //     // reporting service, for example Sentry
-//     console.warn(error);
+//     console.warn;
 //   };
 
-//   _handleFinishLoading = () => {
-//     this.setState({ isLoadingComplete: true });
+//  function _handleFinishLoading() {
+//     setLoading(true);
 //   };
+
+  
+//   if(!fontsLoaded && !isLoadingComplete) {
+//     return (
+//       <AppLoading
+//         startAsync={_loadResourcesAsync}
+//         // onError={_handleLoadingError}
+//         onFinish={_handleFinishLoading}
+//       />
+//     );
+//   } else if(fontsLoaded) {
+//     return (
+//       <NavigationContainer>
+//         <GalioProvider theme={argonTheme}>
+//           <Block flex>
+//             <Screens />
+//           </Block>
+//         </GalioProvider>
+//       </NavigationContainer>
+//     );
+//   }
 // }
